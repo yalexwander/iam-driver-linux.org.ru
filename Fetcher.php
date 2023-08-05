@@ -6,7 +6,6 @@ use ItIsAllMail\Interfaces\FetchDriverInterface;
 use ItIsAllMail\DriverCommon\AbstractFetcherDriver;
 use ItIsAllMail\HtmlToText;
 use ItIsAllMail\CoreTypes\SerializationMessage;
-use ItIsAllMail\Utils\Storage;
 use ItIsAllMail\Utils\Browser;
 use ItIsAllMail\Utils\Debug;
 use ItIsAllMail\Utils\MailHeaderProcessor;
@@ -91,7 +90,8 @@ class LinuxOrgRuFetcher extends AbstractFetcherDriver implements FetchDriverInte
             }
 
             $nextPage = $dom->findMulti(".nav a.page-number");
-            $nextPage = count($nextPage) ? $nextPage[count($nextPage) - 1] : false;
+            $nextPage = $nextPage->count() ? $nextPage[$nextPage->count() - 1] : false;
+
 
             if ($nextPage and strstr($nextPage->text(), "→")) {
                 $url = URLProcessor::getNodeBaseURI($dom, $url) . $nextPage->getAttribute("href");
