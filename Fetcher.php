@@ -73,6 +73,8 @@ class LinuxOrgRuFetcher extends AbstractFetcherDriver implements FetchDriverInte
 
                 $postText = $this->getPostText($postNode);
                 $title = $this->getPostTitle($postNode, $postText);
+                $postURL = $postNode->findOneOrFalse(".msg_body > .reply > ul > li:last-child > a")->getAttribute("href");
+                $postURL = 'https://www.' . $this->driverCode . $postURL;
 
                 $msg = new SerializationMessage(
                     [
@@ -82,7 +84,8 @@ class LinuxOrgRuFetcher extends AbstractFetcherDriver implements FetchDriverInte
                         "created" => $created,
                         "id" => $postId . "@" . $this->getCode(),
                         "body" => $postText,
-                        "thread" => $threadId . "@" . $this->getCode()
+                        "thread" => $threadId . "@" . $this->getCode(),
+                        "uri" => $postURL
                     ]
                 );
 
@@ -91,7 +94,6 @@ class LinuxOrgRuFetcher extends AbstractFetcherDriver implements FetchDriverInte
 
             $nextPage = $dom->findMulti(".nav a.page-number");
             $nextPage = $nextPage->count() ? $nextPage[$nextPage->count() - 1] : false;
-
 
             if ($nextPage and strstr($nextPage->text(), "→")) {
                 $url = URLProcessor::getNodeBaseURI($dom, $url) . $nextPage->getAttribute("href");
@@ -116,7 +118,8 @@ class LinuxOrgRuFetcher extends AbstractFetcherDriver implements FetchDriverInte
             $tagName = $tag->getNode()->nodeName;
             $class = $tag->getAttribute("class");
             if (
-                ($tagName === "div" and
+                (
+                    $tagName === "div" and
                  (
                      ($class === "sign") or
                      ($class === "reply") or
